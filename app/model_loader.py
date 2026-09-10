@@ -45,7 +45,8 @@ def get_model():
 
 
 def _train_model():
-    """Train Voting Classifier with the best params found on Colab."""
+    """Train lightweight Voting Classifier optimized for cloud memory constraints."""
+    from sklearn.ensemble import RandomForestClassifier
     X_train, _, _, y_train, _, _ = load_and_split_data()
 
     preprocessor = build_preprocessor()
@@ -57,13 +58,16 @@ def _train_model():
     )
 
     extra_trees = ExtraTreesClassifier(
-        n_estimators=100,
+        n_estimators=30,
+        max_depth=12,
         random_state=RANDOM_STATE,
         n_jobs=-1,
     )
 
-    knn = KNeighborsClassifier(
-        n_neighbors=10,
+    rf = RandomForestClassifier(
+        n_estimators=25,
+        max_depth=10,
+        random_state=RANDOM_STATE,
         n_jobs=-1,
     )
 
@@ -71,7 +75,7 @@ def _train_model():
         estimators=[
             ("logistic", logistic),
             ("extra_trees", extra_trees),
-            ("knn", knn),
+            ("rf", rf),
         ],
         voting="soft",
     )
@@ -83,12 +87,12 @@ def _train_model():
         ]
     )
 
-    print("[model_loader] Training...")
+    print("[model_loader] Training lightweight ensemble model...")
     pipeline.fit(X_train, y_train)
     print("[model_loader] Training complete.")
 
     os.makedirs(MODEL_PATH.parent, exist_ok=True)
-    joblib.dump(pipeline, MODEL_PATH)
+    joblib.dump(pipeline, MODEL_PATH, compress=3)
     print(f"[model_loader] Model saved to: {MODEL_PATH}")
 
     return pipeline

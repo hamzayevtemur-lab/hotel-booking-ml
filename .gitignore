@@ -15,8 +15,9 @@ env/
 # data/raw/
 # data/processed/
 
-# Trained models
+# Trained models (commit only the 0.78 MB compressed voting classifier for instant cloud load)
 models/*.joblib
+!models/voting_classifier.joblib
 
 # Environment variables
 .env
