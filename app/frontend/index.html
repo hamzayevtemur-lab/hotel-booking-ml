@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CancelGuard — Hotel Booking Cancellation Predictor</title>
+  <meta name="description" content="AI-powered hotel booking cancellation risk predictor. Enter booking details and get an instant prediction powered by a Voting Classifier with 90% ROC-AUC." />
+  <link rel="stylesheet" href="/static/style.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏨</text></svg>" />
+</head>
+<body>
+
+<!-- Animated background orbs -->
+<div class="bg-orbs">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+</div>
+
+<div class="app">
+
+  <!-- ── Header ───────────────────────────── -->
+  <header>
+    <div class="logo">
+      <span class="logo-icon">🏨</span>
+      <span>CancelGuard</span>
+    </div>
+    <nav>
+      <button class="tab-btn active" data-tab="predict" id="nav-predict">🔍 Predict</button>
+      <button class="tab-btn" data-tab="dashboard" id="nav-dashboard">📊 Dashboard</button>
+    </nav>
+  </header>
+
+  <!-- ── Main ─────────────────────────────── -->
+  <main>
+
+    <!-- ════════════════════════════════════
+         TAB 1: PREDICTION FORM
+    ════════════════════════════════════ -->
+    <div id="tab-predict" class="tab-content active">
+
+      <div class="hero">
+        <h1>Will This Booking Be Cancelled?</h1>
+        <p>Enter the booking details below and our AI model will instantly predict the cancellation risk — helping your team act before it's too late.</p>
+      </div>
+
+      <form id="prediction-form" novalidate>
+
+        <div class="form-grid">
+
+          <!-- ── Hotel & Dates ── -->
+          <div class="card">
+            <div class="section-header">
+              <div class="section-icon">🏨</div>
+              <span class="section-title">Hotel &amp; Arrival Dates</span>
+            </div>
+            <div class="fields-grid">
+              <div class="field field-full">
+                <label for="arrival_date_picker">📅 Quick Arrival Date Picker (Auto-Fills Below)</label>
+                <input type="date" id="arrival_date_picker" style="color-scheme: dark;" />
+              </div>
+              <div class="field">
+                <label for="hotel">Hotel Type</label>
+                <select id="hotel" name="hotel">
+                  <option value="City Hotel">City Hotel</option>
+                  <option value="Resort Hotel" selected>Resort Hotel</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="total_nights">Total Stay (Nights)</label>
+                <input type="number" id="total_nights" value="3" min="1" max="60" />
+              </div>
+              <div class="field">
+                <label for="arrival_date_year">Arrival Year</label>
+                <select id="arrival_date_year" name="arrival_date_year">
+                  <option value="2024">2024</option>
+                  <option value="2025">2025</option>
+                  <option value="2026" selected>2026</option>
+                  <option value="2027">2027</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="arrival_date_month">Arrival Month</label>
+                <select id="arrival_date_month" name="arrival_date_month">
+                  <option>January</option><option>February</option><option>March</option>
+                  <option>April</option><option>May</option><option>June</option>
+                  <option>July</option><option>August</option><option>September</option>
+                  <option selected>October</option><option>November</option><option>December</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="arrival_date_day_of_month">Arrival Day</label>
+                <input type="number" id="arrival_date_day_of_month" name="arrival_date_day_of_month" value="10" min="1" max="31" />
+              </div>
+              <div class="field">
+                <label for="arrival_date_week_number">Week Number ⚡</label>
+                <input type="number" id="arrival_date_week_number" name="arrival_date_week_number" value="41" min="1" max="53" />
+              </div>
+              <div class="field">
+                <label for="lead_time">Lead Time (days) ⚡</label>
+                <input type="number" id="lead_time" name="lead_time" value="30" min="0" />
+              </div>
+              <div class="field">
+                <label for="stays_in_week_nights">Weekday Nights ⚡</label>
+                <input type="number" id="stays_in_week_nights" name="stays_in_week_nights" value="2" min="0" />
+              </div>
+              <div class="field">
+                <label for="stays_in_weekend_nights">Weekend Nights ⚡</label>
+                <input type="number" id="stays_in_weekend_nights" name="stays_in_weekend_nights" value="1" min="0" />
+              </div>
+            </div>
+          </div>
+
+          <!-- ── Guests ── -->
+          <div class="card">
+            <div class="section-header">
+              <div class="section-icon">👥</div>
+              <span class="section-title">Guest Information</span>
+            </div>
+            <div class="fields-grid">
+              <div class="field">
+                <label for="adults">Adults</label>
+                <input type="number" id="adults" name="adults" value="2" min="0" max="55" />
+              </div>
+              <div class="field">
+                <label for="children">Children</label>
+                <input type="number" id="children" name="children" value="0" min="0" max="10" />
+              </div>
+              <div class="field">
+                <label for="babies">Babies</label>
+                <input type="number" id="babies" name="babies" value="0" min="0" max="10" />
+              </div>
+              <div class="field">
+                <label for="customer_type">Customer Type</label>
+                <select id="customer_type" name="customer_type">
+                  <option selected>Transient</option>
+                  <option>Transient-Party</option>
+                  <option>Contract</option>
+                  <option>Group</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="country">Country Code</label>
+                <input type="text" id="country" name="country" value="PRT" placeholder="e.g. PRT, GBR, USA" list="country-list" />
+                <datalist id="country-list">
+                  <option value="PRT"><option value="GBR"><option value="FRA">
+                  <option value="ESP"><option value="DEU"><option value="ITA">
+                  <option value="USA"><option value="BEL"><option value="NLD">
+                  <option value="IRL"><option value="BRA"><option value="CHN">
+                  <option value="POL"><option value="ROU"><option value="RUS">
+                  <option value="AUS"><option value="SGP"><option value="ARE">
+                </datalist>
+              </div>
+              <div class="field toggle-field">
+                <span class="toggle-label">Returning Guest</span>
+                <label class="toggle">
+                  <input type="checkbox" id="is_repeated_guest" name="is_repeated_guest" />
+                  <span class="slider"></span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- ── Booking Info ── -->
+          <div class="card">
+            <div class="section-header">
+              <div class="section-icon">📋</div>
+              <span class="section-title">Booking Details</span>
+            </div>
+            <div class="fields-grid">
+              <div class="field">
+                <label for="meal">Meal Plan</label>
+                <select id="meal" name="meal">
+                  <option value="BB" selected>BB — Bed &amp; Breakfast</option>
+                  <option value="HB">HB — Half Board</option>
+                  <option value="FB">FB — Full Board</option>
+                  <option value="SC">SC — Self Catering</option>
+                  <option value="Undefined">Undefined</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="deposit_type">Deposit Type</label>
+                <select id="deposit_type" name="deposit_type">
+                  <option value="No Deposit" selected>No Deposit</option>
+                  <option value="Non Refund">Non-Refundable</option>
+                  <option value="Refundable">Refundable</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="market_segment">Market Segment</label>
+                <select id="market_segment" name="market_segment">
+                  <option>Online TA</option>
+                  <option>Offline TA/TO</option>
+                  <option>Direct</option>
+                  <option>Corporate</option>
+                  <option>Groups</option>
+                  <option>Complementary</option>
+                  <option>Aviation</option>
+                  <option>Undefined</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="distribution_channel">Distribution Channel</label>
+                <select id="distribution_channel" name="distribution_channel">
+                  <option value="TA/TO" selected>TA/TO</option>
+                  <option value="Direct">Direct</option>
+                  <option value="Corporate">Corporate</option>
+                  <option value="GDS">GDS</option>
+                  <option value="Undefined">Undefined</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="previous_cancellations">Prior Cancellations</label>
+                <input type="number" id="previous_cancellations" name="previous_cancellations" value="0" min="0" />
+              </div>
+              <div class="field">
+                <label for="previous_bookings_not_canceled">Prior Completed Bookings</label>
+                <input type="number" id="previous_bookings_not_canceled" name="previous_bookings_not_canceled" value="0" min="0" />
+              </div>
+              <div class="field">
+                <label for="days_in_waiting_list">Days on Waiting List</label>
+                <input type="number" id="days_in_waiting_list" name="days_in_waiting_list" value="0" min="0" />
+              </div>
+            </div>
+          </div>
+
+          <!-- ── Room & Financials ── -->
+          <div class="card">
+            <div class="section-header">
+              <div class="section-icon">🛏️</div>
+              <span class="section-title">Room &amp; Financials</span>
+            </div>
+            <div class="fields-grid">
+              <div class="field">
+                <label for="reserved_room_type">Reserved Room Type</label>
+                <select id="reserved_room_type" name="reserved_room_type">
+                  <option selected>A</option><option>B</option><option>C</option>
+                  <option>D</option><option>E</option><option>F</option>
+                  <option>G</option><option>H</option><option>I</option>
+                  <option>J</option><option>L</option><option>P</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="assigned_room_type">Assigned Room Type</label>
+                <select id="assigned_room_type" name="assigned_room_type">
+                  <option selected>A</option><option>B</option><option>C</option>
+                  <option>D</option><option>E</option><option>F</option>
+                  <option>G</option><option>H</option><option>I</option>
+                  <option>J</option><option>K</option><option>P</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="adr">Average Daily Rate (€)</label>
+                <input type="number" id="adr" name="adr" value="100" min="0" step="0.01" />
+              </div>
+              <div class="field">
+                <label for="required_car_parking_spaces">Parking Spaces</label>
+                <input type="number" id="required_car_parking_spaces" name="required_car_parking_spaces" value="0" min="0" max="8" />
+              </div>
+              <div class="field field-full">
+                <label for="total_of_special_requests">Total Special Requests</label>
+                <input type="number" id="total_of_special_requests" name="total_of_special_requests" value="0" min="0" max="5" />
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /form-grid -->
+
+        <!-- Submit -->
+        <div class="submit-wrap">
+          <button type="submit" class="btn-predict" id="submit-btn">
+            <div class="spinner" id="spinner"></div>
+            <span id="btn-text">⚡ Analyse Booking</span>
+          </button>
+        </div>
+
+      </form><!-- /form -->
+
+      <!-- ── Result Panel ── -->
+      <div id="result-panel" class="hidden">
+        <div class="card" style="margin-top: 2rem;">
+          <div class="result-inner">
+
+            <!-- Gauge -->
+            <div class="gauge-wrap">
+              <svg class="gauge-svg" width="130" height="130" viewBox="0 0 130 130">
+                <circle class="gauge-track" cx="65" cy="65" r="54" fill="none" stroke-width="10" />
+                <circle class="gauge-fill" id="gauge-fill" cx="65" cy="65" r="54" fill="none" stroke-width="10"
+                  stroke-dasharray="339.3" stroke-dashoffset="339.3" stroke="#6366f1" />
+              </svg>
+              <div class="gauge-label">
+                <div class="gauge-pct" id="gauge-pct">0%</div>
+                <div class="gauge-sub">Cancellation Risk</div>
+              </div>
+            </div>
+
+            <!-- Details -->
+            <div class="result-details">
+              <div class="result-badge" id="result-badge">— —</div>
+
+              <div class="result-stats">
+                <div class="stat">
+                  <span class="stat-label">Probability</span>
+                  <span class="stat-value" id="stat-prob">—</span>
+                </div>
+                <div class="stat">
+                  <span class="stat-label">Risk Level</span>
+                  <span class="stat-value" id="stat-risk">—</span>
+                </div>
+                <div class="stat">
+                  <span class="stat-label">Model Threshold</span>
+                  <span class="stat-value" id="stat-threshold">0.37</span>
+                </div>
+              </div>
+
+              <div class="result-note" id="result-note">
+                —
+              </div>
+            </div>
+
+          </div><!-- /result-inner -->
+        </div>
+      </div><!-- /result-panel -->
+
+    </div><!-- /tab-predict -->
+
+    <!-- ════════════════════════════════════
+         TAB 2: DASHBOARD
+    ════════════════════════════════════ -->
+    <div id="tab-dashboard" class="tab-content">
+
+      <div class="dashboard-hero">
+        <h1>📊 Model Performance Dashboard</h1>
+        <p>Experiment results, model comparison charts, and final evaluation on the held-out test set.</p>
+      </div>
+
+      <!-- Metrics Table -->
+      <div class="section-divider"><h2>Validation Metrics — All Models</h2></div>
+      <div class="card">
+        <div class="metrics-table-wrap">
+          <table class="metrics-table">
+            <thead>
+              <tr>
+                <th>Model</th>
+                <th>Accuracy</th>
+                <th>Precision</th>
+                <th>Recall</th>
+                <th>F1 Score</th>
+                <th>ROC-AUC</th>
+                <th>PR-AUC</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Logistic Regression</td>
+                <td>0.7790</td><td>0.5669</td><td>0.8345</td>
+                <td>0.6751</td><td>0.8699</td><td>0.6842</td>
+              </tr>
+              <tr>
+                <td>AdaBoost</td>
+                <td>0.7488</td><td>0.8008</td><td>0.1161</td>
+                <td>0.2028</td><td>0.8292</td><td>0.6088</td>
+              </tr>
+              <tr>
+                <td>Bagging Classifier</td>
+                <td>0.8505</td><td>0.7480</td><td>0.6890</td>
+                <td>0.7173</td><td>0.9135</td><td>0.8038</td>
+              </tr>
+              <tr class="best-row">
+                <td>Voting Classifier <span class="best-badge">Final Model ⭐</span></td>
+                <td>0.8423</td><td>0.7655</td><td>0.6157</td>
+                <td>0.6825</td><td>0.9037</td><td>0.7918</td>
+              </tr>
+              <tr>
+                <td>Stacking Classifier</td>
+                <td>0.8247</td><td>0.7235</td><td>0.5879</td>
+                <td>0.6487</td><td>0.8828</td><td>0.7423</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Final Test Results -->
+      <div class="section-divider"><h2>Final Test Set — Voting Classifier (Threshold 0.37)</h2></div>
+      <div class="card" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:1.25rem;text-align:center;">
+        <div class="stat">
+          <span class="stat-label">Accuracy</span>
+          <span class="stat-value" style="font-size:1.4rem;color:var(--accent)">82.77%</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Precision</span>
+          <span class="stat-value" style="font-size:1.4rem;color:var(--accent)">65.76%</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Recall</span>
+          <span class="stat-value" style="font-size:1.4rem;color:var(--primary)">78.07%</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">F1 Score</span>
+          <span class="stat-value" style="font-size:1.4rem;color:var(--primary)">71.39%</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">ROC-AUC</span>
+          <span class="stat-value" style="font-size:1.4rem;color:var(--accent)">89.81%</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">PR-AUC</span>
+          <span class="stat-value" style="font-size:1.4rem;color:var(--accent)">77.92%</span>
+        </div>
+      </div>
+
+      <!-- Charts -->
+      <div class="section-divider"><h2>Model Comparison Charts</h2></div>
+      <div class="charts-grid">
+
+        <div class="card chart-card">
+          <div class="chart-title">📊 Classification Metrics by Model</div>
+          <img src="/figures/classification_metrics.png" alt="Classification Metrics" loading="lazy" />
+        </div>
+
+        <div class="card chart-card">
+          <div class="chart-title">📈 ROC-AUC vs PR-AUC</div>
+          <img src="/figures/roc_auc_vs_pr_auc.png" alt="ROC AUC vs PR AUC" loading="lazy" />
+        </div>
+
+        <div class="card chart-card">
+          <div class="chart-title">⏱️ Training Time Comparison</div>
+          <img src="/figures/training_time.png" alt="Training Time" loading="lazy" />
+        </div>
+
+        <div class="card chart-card">
+          <div class="chart-title">🎯 Precision / Recall / F1 vs Threshold</div>
+          <img src="/figures/threshold_metrics.png" alt="Threshold Metrics" loading="lazy" />
+        </div>
+
+        <div class="card chart-card">
+          <div class="chart-title">🗃️ Confusion Matrix — Default Threshold (0.50)</div>
+          <img src="/figures/final_confusion_matrix_default.png" alt="Confusion Matrix Default" loading="lazy" />
+        </div>
+
+        <div class="card chart-card">
+          <div class="chart-title">🗃️ Confusion Matrix — Tuned Threshold (0.37)</div>
+          <img src="/figures/final_confusion_matrix_tuned.png" alt="Confusion Matrix Tuned" loading="lazy" />
+        </div>
+
+        <div class="card chart-card" style="grid-column: 1 / -1;">
+          <div class="chart-title">⚖️ Final Test Performance: Default vs Tuned Threshold</div>
+          <img src="/figures/final_threshold_comparison.png" alt="Threshold Comparison" loading="lazy" style="max-width:700px;margin:0 auto;display:block;" />
+        </div>
+
+      </div>
+
+    </div><!-- /tab-dashboard -->
+
+  </main>
+</div><!-- /app -->
+
+<script src="/static/script.js"></script>
+</body>
+</html>

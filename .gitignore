@@ -11,9 +11,9 @@ env/
 # Jupyter
 .ipynb_checkpoints/
 
-# Data
-data/raw/
-data/processed/
+# Data (raw data is committed for reproducibility and Render deployment)
+# data/raw/
+# data/processed/
 
 # Trained models
 models/*.joblib
