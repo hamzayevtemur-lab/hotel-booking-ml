@@ -1,0 +1,40 @@
+HOTEL BOOKING ML — FINAL TEST RESULTS
+======================================================================
+
+MODEL: Voting Classifier
+Default threshold: 0.50
+Tuned threshold: 0.37
+
+DEFAULT THRESHOLD — 0.50
+----------------------------------------
+Accuracy : 0.8359
+Precision: 0.7525
+Recall   : 0.6019
+F1 Score : 0.6688
+ROC-AUC  : 0.8981
+PR-AUC   : 0.7792
+
+Confusion Matrix:
+[[8770  713]
+ [1434 2168]]
+
+TUNED THRESHOLD
+----------------------------------------
+Threshold: 0.37
+Accuracy : 0.8277
+Precision: 0.6576
+Recall   : 0.7807
+F1 Score : 0.7139
+ROC-AUC  : 0.8981
+PR-AUC   : 0.7792
+
+Confusion Matrix:
+[[8019 1464]
+ [ 790 2812]]
+
+METRIC CHANGES
+----------------------------------------
+Accuracy change : -0.0082
+Precision change: -0.0949
+Recall change   : +0.1788
+F1 change       : +0.0451

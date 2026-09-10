@@ -1,0 +1,6 @@
+{
+    "model__bootstrap": true,
+    "model__estimator__max_depth": null,
+    "model__max_samples": 1.0,
+    "model__n_estimators": 200
+}

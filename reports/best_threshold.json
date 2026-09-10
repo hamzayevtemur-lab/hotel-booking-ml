@@ -1,0 +1,10 @@
+{
+    "threshold": 0.37,
+    "selection_metric": "f1",
+    "validation_f1": 0.7321221492075763,
+    "validation_accuracy": 0.8411036380311832,
+    "validation_precision": 0.6829326923076923,
+    "validation_recall": 0.7889475145792836,
+    "validation_roc_auc": 0.9124557448466735,
+    "validation_pr_auc": 0.8047522421258576
+}
